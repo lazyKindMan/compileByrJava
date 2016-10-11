@@ -1,5 +1,4 @@
 package compiler_H_java;
-import java.io.Console;
 import java.util.*;
 public class Compiler {
 	public static void main(String[] args)
@@ -12,9 +11,14 @@ public class Compiler {
 //		System.out.println(cpCount);
 //		Scanner in= new Scanner(System.in);
 //		String name=in.nextLine();
-		Console cons=System.console();
-		String usrname=cons.readLine();
-		System.out.println(cons.readLine());
+//		Stack <Character>stack=new Stack<Character>();
+//		stack.push('1');
+//		System.out.println(stack.pop());
 //		char[] passwd=cons.readPassword();
+		System.out.println("请输入你的正则表达式，以#号结束");
+		Scanner in=new Scanner(System.in);
+		String exp=in.next();
+		RegularExpRecognize rec=new RegularExpRecognize(exp);
+		rec.RegularExtract();
 	}
 }
