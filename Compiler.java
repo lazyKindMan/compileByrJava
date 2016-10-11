@@ -3,7 +3,7 @@ import java.util.*;
 public class Compiler {
 	public static void main(String[] args)
 	{
-//		String greeting="ÄãºÃ";
+//		String greeting="ï¿½ï¿½ï¿½";
 //		int n=greeting.length();
 //		int cpCount=greeting.codePointCount(0,greeting.length());
 //		 
@@ -15,7 +15,7 @@ public class Compiler {
 //		stack.push('1');
 //		System.out.println(stack.pop());
 //		char[] passwd=cons.readPassword();
-		System.out.println("ÇëÊäÈëÄãµÄÕıÔò±í´ïÊ½£¬ÒÔ#ºÅ½áÊø");
+		System.out.println("è¯·è¾“å…¥ä½ çš„æ­£åˆ™è¡¨è¾¾å¼ï¼Œä»¥#å·ç»“å°¾");
 		Scanner in=new Scanner(System.in);
 		String exp=in.next();
 		RegularExpRecognize rec=new RegularExpRecognize(exp);

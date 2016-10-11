@@ -1,21 +1,21 @@
 package compiler_H_java;
-//ÕıÔò±í´ïÊ½µÄÊ¶±ğÀà
+//æ­£åˆ™è¡¨è¾¾å¼çš„è¯†åˆ«ç±»
 import java.util.*;
-//ÎªÁË¼ò»¯£¬(?:) (?=) ¶¼²»²ÎÓëÆ¥Åä $\^²»²Î¼ÓÆ¥Åä
+//ä¸ºäº†ç®€åŒ–ï¼Œ(?:) (?=) éƒ½ä¸å‚ä¸åŒ¹é… $\^ä¸å‚åŠ åŒ¹é…
 public class RegularExpRecognize {
-	private Stack<String> Optr=new Stack<String>();//½¨Á¢Ò»¸ö´æ·ÅÕıÔò·ûµÄÕ»¶ÔÏó
-	private Stack<String> Opnd=new Stack<String>();//½¨Á¢Ò»¸ö´æ·Å×ÖÄ¸ÖµµÃÕ»
-	private String regularExp;//ÕıÔò±í´ïÊ½´æ´¢
+	private Stack<String> Optr=new Stack<String>();//å»ºç«‹ä¸€ä¸ªå­˜æ”¾æ­£åˆ™ç¬¦çš„æ ˆå¯¹è±¡
+	private Stack<String> Opnd=new Stack<String>();//å»ºç«‹ä¸€ä¸ªå­˜æ”¾å­—æ¯å€¼å¾—æ ˆ
+	private String regularExp;//æ­£åˆ™è¡¨è¾¾å¼å­˜å‚¨
 	
 	public RegularExpRecognize(String Exp)
 	{
-		regularExp=Exp;//¹¹ÔìÆ÷³õÊ¼¸³Öµ¸øÒªÅĞ¶ÏµÄÕıÔò
+		regularExp=Exp;//æ„é€ å™¨åˆå§‹èµ‹å€¼ç»™è¦åˆ¤æ–­çš„æ­£åˆ™
 	}
-	private int IsFirst(String fir,String sec)//ÅĞ¶ÏÓÅÏÈ¼¶
+	private int IsFirst(String fir,String sec)//åˆ¤æ–­ä¼˜å…ˆçº§
 	{
 		switch(fir)
 		{
-		//Õ»¶¥Îª×óÀ¨ºÅ²»¹ÜºóÃæÊÇÊ²Ã´·ûºÅÖ±½ÓÈëÕ»
+		//æ ˆé¡¶ä¸ºå·¦æ‹¬å·ä¸ç®¡åé¢æ˜¯ä»€ä¹ˆç¬¦å·ç›´æ¥å…¥æ ˆ
 		case "(":return -1;
 		case "[":return -1;	
 		case "?":
@@ -32,7 +32,7 @@ public class RegularExpRecognize {
 			else return 1;
 		default :
 			if(sec.equals("|")) return -3;
-			 return -1;//·µ»Ø´íÎó
+			 return -1;//è¿”å›é”™è¯¯
 		}
 		
 	}
@@ -42,44 +42,29 @@ public class RegularExpRecognize {
 			return true;
 		else return false;
 	}
-	//Òì³£´íÎó´¦Àí±¨¸æ·½·¨
+	//å¼‚å¸¸é”™è¯¯å¤„ç†æŠ¥å‘Šæ–¹æ³•
 	private void ErrorRep()
 	{
-		System.out.println("ÊäÈëµÄ±í´ïÊ½Òì³£");
-		System.exit(-1);//Í£Ö¹³ÌĞò
+		System.out.println("è¾“å…¥çš„è¡¨è¾¾å¼å¼‚å¸¸");
+		System.exit(-1);//åœæ­¢ç¨‹åº
 	}
 	private void Define(String ch)
 	{
 			if(IsOptr(ch)) 
 			{
-				if(Optr.isEmpty()&&ch.equals("|"))//Ö»ÓĞµ±²Ù×÷·ûÕ»Îª¿ÕÇÒµÚÒ»¸ö²Ù×÷·ûÎªË«Ä¿²ÅÑ¹Õ»,
-					//ÒâÎ¶×Å²Ù×÷·ûÕ»Ö»´æ´¢Ë«Ä¿·ûºÍÀ¨ºÅ
+				if(Optr.isEmpty()&&ch.equals("|"))//åªæœ‰å½“æ“ä½œç¬¦æ ˆä¸ºç©ºä¸”ç¬¬ä¸€ä¸ªæ“ä½œç¬¦ä¸ºåŒç›®æ‰å‹æ ˆ,
+					//æ„å‘³ç€æ“ä½œç¬¦æ ˆåªå­˜å‚¨åŒç›®ç¬¦å’Œ
 					Optr.push(ch);
 				else if(ch.equals("(")||ch.equals("["))
 					Optr.push(ch);
-				else if(ch.equals(")"))//Èç¹ûÎªÓÒÀ¨ºÅ£¬µ¯³öËùÓÖÖĞ¼ä²Ù×÷
+				else if(ch.equals(")"))//å¦‚æœä¸ºå³æ‹¬å·ï¼Œå¼¹å‡ºæ‰€åˆä¸­é—´æ“ä½œ
 				{
-					String newExp;//Éú³ÉĞÂµÄÈëÕ»±í´ïÊ½
+					String newExp;//ç”Ÿæˆæ–°çš„å…¥æ ˆè¡¨è¾¾å¼
 					if(!Opnd.isEmpty()&&!Optr.isEmpty())
 					{	
 						String optr=Optr.pop();
 						while(!optr.equals("("))
 							{
-								if(!optr.equals("|"))
-								{
-									if(!Opnd.isEmpty())//Èç¹ûÊıÖµÕ»²»Îª¿Õ
-									{
-										newExp=Opnd.pop()+optr;
-										Opnd.push(newExp);//²Ù×÷ÍêÈëÕ»
-										System.out.println(Opnd.peek());//test
-									}
-									else 
-									{
-										ErrorRep();
-									}
-								}
-								else
-								{
 									if(!Opnd.isEmpty())
 									{
 										newExp=optr+Opnd.pop();
@@ -92,36 +77,20 @@ public class RegularExpRecognize {
 										else ErrorRep();
 									}
 									else ErrorRep();
-								}
-							  optr=Optr.pop();//Íü¼ÇÔÙ³öÕ»ÁË
+							  optr=Optr.pop();//å¿˜è®°å†å‡ºæ ˆäº†
 							}
 					}
 					else ErrorRep();
 					
 				}
-				else if(ch.equals("]"))//Èç¹ûÎªÓÒÖĞÀ¨ºÅ£¬µ¯³öËùÓÖÖĞ¼ä²Ù×÷
+				else if(ch.equals("]"))//å¦‚æœä¸ºå³ä¸­æ‹¬å·ï¼Œå¼¹å‡ºæ‰€åˆä¸­é—´æ“ä½œ
 				{
-					String newExp;//Éú³ÉĞÂµÄÈëÕ»±í´ïÊ½
+					String newExp;//ç”Ÿæˆæ–°çš„å…¥æ ˆè¡¨è¾¾å¼
 					if(!Opnd.isEmpty()&&!Optr.isEmpty())
 					{	
 						String optr=Optr.pop();
 						while(!optr.equals("["))
 							{
-								if(!optr.equals("|"))
-								{
-									if(!Opnd.isEmpty())//Èç¹ûÊıÖµÕ»²»Îª¿Õ
-									{
-										newExp=Opnd.pop()+optr;
-										Opnd.push(newExp);//²Ù×÷ÍêÈëÕ»
-										System.out.println(Opnd.peek());//test
-									}
-									else 
-									{
-										ErrorRep();
-									}
-								}
-								else
-								{
 									if(!Opnd.isEmpty())
 									{
 										newExp=optr+Opnd.pop();
@@ -134,7 +103,7 @@ public class RegularExpRecognize {
 										else ErrorRep();
 									}
 									else ErrorRep();
-								}
+								optr=Optr.pop();//å¿˜è®°å†å‡ºæ ˆäº†
 							}
 					}
 					else ErrorRep();
@@ -143,29 +112,29 @@ public class RegularExpRecognize {
 				else switch(IsFirst(Optr.peek(),ch))
 				{
 					case -1:
-						Optr.push(ch);//Õ»¶¥ÓÅÏÈ¼¶µÍ£¬»òÕßÕ»¶¥Îª×óÀ¨ºÅ,ÈëÕ»
+						Optr.push(ch);//æ ˆé¡¶ä¼˜å…ˆçº§ä½ï¼Œæˆ–è€…æ ˆé¡¶ä¸ºå·¦æ‹¬å·,å…¥æ ˆ
 						break;
-					case 1://¼ÓÁË¸öÃ»±ØÒªµÄÅĞ¶Ï£¬·½±ãÒÔºóÌí¼ÓĞÂµÄÕıÔò¹æÔò
+					case 1://åŠ äº†ä¸ªæ²¡å¿…è¦çš„åˆ¤æ–­ï¼Œæ–¹ä¾¿ä»¥åæ·»åŠ æ–°çš„æ­£åˆ™è§„åˆ™
 						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
 						{	
 							if(!Opnd.isEmpty())
 							{	
 								String firCh=(String) Opnd.pop();
-								Opnd.push(firCh+ch);//½«²Ù×÷ÊıºÍ²Ù×÷·ûÒ»ÆğÈëÕ»
+								Opnd.push(firCh+ch);//å°†æ“ä½œæ•°å’Œæ“ä½œç¬¦ä¸€èµ·å…¥æ ˆ
 								System.out.println(Opnd.peek());//test
 							}
 							else ErrorRep();
 						}
 							break;
-					case 0://²Ù×÷·ûÓÅÏÈ¼¶ÏàÍ¬£¬×ó½áºÏ¹æÔòÏÈ¼ÆËãÈëÕ»µÄ
-						//¼ÓÁË¸öÃ»±ØÒªµÄÅĞ¶Ï£¬·½±ãÒÔºóÌí¼ÓĞÂµÄÕıÔò¹æÔò
+					case 0://æ“ä½œç¬¦ä¼˜å…ˆçº§ç›¸åŒï¼Œå·¦ç»“åˆè§„åˆ™å…ˆè®¡ç®—å…¥æ ˆçš„
+						//åŠ äº†ä¸ªæ²¡å¿…è¦çš„åˆ¤æ–­ï¼Œæ–¹ä¾¿ä»¥åæ·»åŠ æ–°çš„æ­£åˆ™è§„åˆ™
 						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
 						{
 							if(!Opnd.isEmpty())
 							{
 								String firCh=(String) Opnd.pop();
-								String normalOptr=(String) Optr.pop();//½«Õ»¶¥ÔªËØÈ¡³ö
-								Opnd.push(firCh+normalOptr);//ºÏ³ÉÒ»¸ö¿Õ¼äÑ¹ÈëÊıÖµÕ»
+								String normalOptr=(String) Optr.pop();//å°†æ ˆé¡¶å…ƒç´ å–å‡º
+								Opnd.push(firCh+normalOptr);//åˆæˆä¸€ä¸ªç©ºé—´å‹å…¥æ•°å€¼æ ˆ
 								System.out.println(Opnd.peek());//test
 							}
 							else ErrorRep();
@@ -176,9 +145,9 @@ public class RegularExpRecognize {
 					
 			}
 			else 
-				Opnd.push(ch);//ÊıÖµ·ûºÅÈëÕ»
+				Opnd.push(ch);//æ•°å€¼ç¬¦å·å…¥æ ˆ
 	}
-	public void RegularExtract()//ÕıÔò±í´ïÊ½ÌáÈ¡
+	public void RegularExtract()//æ­£åˆ™è¡¨è¾¾å¼æå–
 	{
 		for(int i=0;i<regularExp.length();i++)
 		{
@@ -187,6 +156,6 @@ public class RegularExpRecognize {
 			  Define(subStr);
 			else break;
 		}
-		//Èç¹û·ûºÅ
+		//å¦‚æœç¬¦å·
 	}
 }
