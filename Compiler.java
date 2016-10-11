@@ -20,6 +20,6 @@ public class Compiler {
 		String exp=in.next();
 		RegularExpRecognize rec=new RegularExpRecognize(exp);
 		rec.RegularExtract();
-		rec.testOut();
+		rec.TestOut();
 	}
 }

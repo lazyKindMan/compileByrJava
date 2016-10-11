@@ -4,7 +4,8 @@ import java.util.*;
 //为了简化，(?:) (?=) 都不参与匹配 $\^不参加匹配
 public class RegularExpRecognize {
 	private Stack<String> Optr=new Stack<String>();//建立一个存放正则符的栈对象
-	private Stack<String> Opnd=new Stack<String>();//建立一个存放字母值得栈
+	private Stack<String> RPN=new Stack<String>();//存放逆波兰式
+	private Stack<String> Opnd=new Stack<String>();//存放识别的正则式栈
 	private String regularExp;//正则表达式存储
 	
 	public RegularExpRecognize(String Exp)
@@ -16,8 +17,9 @@ public class RegularExpRecognize {
 		switch(fir)
 		{
 		//栈顶为左括号不管后面是什么符号直接入栈
-		case "(":return -1;
-		case "[":return -1;	
+		case "(":return 1;	
+		case "|":if(sec.equals("|")) return 0;
+				 else return -1; 
 //		case "?":
 //			if(sec.equals("+")||sec.equals("*")) return 0;
 //			else if(sec.equals("(")||sec.equals("[")) return -1;
@@ -30,14 +32,12 @@ public class RegularExpRecognize {
 //			if(sec.equals("+")||sec.equals("?")) return 0;
 //			else if(sec.equals("(")||sec.equals("[")) return -1;
 //			else return 1;
-		default :
-			if(sec.equals("|")) return -3;
-			else return -1;
+		default:return -1;
 		}
 	}
 	private boolean IsOptr(String ch)
 	{
-		if(ch.equals("(")||ch.equals("[")||ch.equals(")")||ch.equals("]")||ch.equals("+")||ch.equals("*")||ch.equals("?")||ch.equals("|"))
+		if(ch.equals("(")||ch.equals(")")||ch.equals("+")||ch.equals("*")||ch.equals("?")||ch.equals("|"))
 			return true;
 		else return false;
 	}
@@ -49,112 +49,114 @@ public class RegularExpRecognize {
 	}
 	private void Define(String ch)
 	{
-			if(IsOptr(ch)) 
+		if(IsOptr(ch))
+		{
+			if(ch.equals("("))
+				Optr.push(ch);
+			else if(ch.equals("|"))
 			{
-				if(Optr.isEmpty()&&ch.equals("|"))//只有当操作符栈为空且第一个操作符为双目才压栈,
-					//意味着操作符栈只存储双目符和
-					Optr.push(ch);
-				else if(ch.equals("(")||ch.equals("["))
-					Optr.push(ch);
-				else if(ch.equals(")"))//如果为右括号，弹出所又中间操作
-				{
-					String newExp;//生成新的入栈表达式
-					if(!Opnd.isEmpty()&&!Optr.isEmpty())
-					{	
-						String optr=Optr.pop();
-						while(!optr.equals("("))
-							{
-									if(!Opnd.isEmpty())
-									{
-										newExp=optr+Opnd.pop();
-										if(!Opnd.isEmpty())
-										{
-											newExp=Opnd.pop()+newExp;
-											Opnd.push(newExp);
-											System.out.println(Opnd.peek());//test
-										}
-										else ErrorRep();
-									}
-									else ErrorRep();
-							  optr=Optr.pop();//忘记再出栈了
-							}
-					}
-					else ErrorRep();
-					
-				}
-				else if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
-				{
-					if(!Opnd.isEmpty())
-					{	
-						String firCh=(String) Opnd.pop();
-						Opnd.push(firCh+ch);//将操作数和操作符一起入栈
-						System.out.println(Opnd.peek());//test
-					}
-					else ErrorRep();
-				}
-				//留着switch方便以后改
+				if(Optr.isEmpty()) Optr.push(ch);//栈为空直接入栈
 				else switch(IsFirst(Optr.peek(),ch))
 				{
-					case -1:
-						Optr.push(ch);//栈顶优先级低，或者栈顶为左括号,入栈
+					//1为直接入栈,0为直接双目运算
+					case 1: Optr.push(ch);break;
+					case 0: 
+					{
+						//循环到栈为空或者优先级比栈顶高
+						while(!Optr.isEmpty())
+						{
+							if(IsFirst(Optr.peek(),ch)==1) break;
+							RPN.push(Optr.pop());
+						}
+						Optr.push(ch);
 						break;
-//					case 0://操作符优先级相同，左结合规则先计算入栈的
-//						//加了个没必要的判断，方便以后添加新的正则规则
-//						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
-//						{
-//							if(!Opnd.isEmpty())
-//							{
-//								String firCh=(String) Opnd.pop();
-//								String normalOptr=(String) Optr.pop();//将栈顶元素取出
-//								Opnd.push(firCh+normalOptr);//合成一个空间压入数值栈
-//								System.out.println(Opnd.peek());//test
-//							}
-//							else ErrorRep();
-//						}
-//						break;
-					default:ErrorRep();
+					}
+					case -1:ErrorRep();break;
+					default:ErrorRep();break;
 				}
-					
 			}
-			else 
-				Opnd.push(ch);//数值符号入栈
+			else if(ch.equals(")"))
+			{
+				if(Optr.isEmpty()) ErrorRep();
+				while(!Optr.peek().equals("("))
+				{
+					RPN.push(Optr.pop());
+					if(Optr.isEmpty()) ErrorRep();
+				}
+				Optr.pop();//取出左括号
+			}
+			else if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
+			{//如果是单目操作符
+				if(RPN.isEmpty()||RPN.peek().equals("(")||RPN.peek().equals("|"))
+					ErrorRep();
+				else RPN.push(ch);//单操作符直接入栈
+			}
+			else ErrorRep();
+		}
+		else RPN.push(ch);
 	}
-	public void RegularExtract()//正则表达式提取
+	public void RegularExtract()//正则表达式提取,图的创建
 	{
+		String Opreation;//返回的字符串，
 		for(int i=0;i<regularExp.length();i++)
 		{
-			String subStr=regularExp.substring(i, i+1);
-			if(!subStr.equals("#"))
-			  Define(subStr);
-			else break;
-		}
-		if(!Optr.isEmpty())//左右括号提取完了，就剩下双目符|
-		{
-			String tem=Optr.pop();
-			if(tem.equals("(")) ErrorRep();
-			else 
+			String ch=regularExp.substring(i, i+1);
+			if(!ch.equals("#"))
 			{
-				if(!Opnd.isEmpty())
+				Define(ch);
+			}
+		}
+		while(!Optr.isEmpty())
+		 RPN.push(Optr.pop());
+		//至此逆波兰式已经生成
+		String newRPN="";//将栈中的逆波兰式存入改变量
+		while(!RPN.isEmpty())
+		{
+			newRPN=RPN.pop()+newRPN;
+		}
+		System.out.println(newRPN);
+		for(int i=0;i<newRPN.length();i++)
+		{
+			String tem=newRPN.substring(i, i+1);
+			if(IsOptr(tem)&&!tem.equals(")"))
+			{
+				if(tem.equals("|"))
 				{
-					String newExp;
-					String secOpnd=Opnd.pop();
 					if(!Opnd.isEmpty())
 					{
-						String firOpnd=Opnd.pop();
-						Opnd.push(firOpnd+tem+secOpnd);
+						String temp1=Opnd.pop();
+						if(!Opnd.isEmpty())
+							{
+								String temp2=Opnd.pop();
+								Opnd.push(temp2+tem+temp1);
+//								System.out.println(temp2+tem+temp1);//test
+							}
+						else ErrorRep();
+					}
+					else ErrorRep();
+				}
+				else if(tem.equals("+")||tem.equals("?")||tem.equals("*"))
+				{
+					if(!Opnd.isEmpty())
+					{
+						Opnd.push(Opnd.pop()+tem);
+//						System.out.println(Opnd.peek());//test
 					}
 					else ErrorRep();
 				}
 				else ErrorRep();
 			}
+			else if(!tem.equals(")"))//如果不是操作符且不是括号，直接存入栈
+			{
+				Opnd.push(tem);
+//				System.out.println(Opnd.peek());//test
+			}
+			else ErrorRep();
 		}
-		//如果符号
 	}
-	public void testOut()//测试方法，把栈中的元素全部输出
+	public void TestOut()//test
 	{
 		while(!Opnd.isEmpty())
-		{
-			System.out.println(Opnd.pop());
-		}
+		System.out.print(Opnd.pop());
 	}
 }
