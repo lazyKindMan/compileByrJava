@@ -18,23 +18,22 @@ public class RegularExpRecognize {
 		//栈顶为左括号不管后面是什么符号直接入栈
 		case "(":return -1;
 		case "[":return -1;	
-		case "?":
-			if(sec.equals("+")||sec.equals("*")) return 0;
-			else if(sec.equals("(")||sec.equals("[")) return -1;
-			else return 1;
-		case "+":
-			if(sec.equals("?")||sec.equals("*")) return 0;
-			else if(sec.equals("(")||sec.equals("[")) return -1;
-			else return 1;
-		case "*":
-			if(sec.equals("+")||sec.equals("?")) return 0;
-			else if(sec.equals("(")||sec.equals("[")) return -1;
-			else return 1;
+//		case "?":
+//			if(sec.equals("+")||sec.equals("*")) return 0;
+//			else if(sec.equals("(")||sec.equals("[")) return -1;
+//			else return 1;
+//		case "+":
+//			if(sec.equals("?")||sec.equals("*")) return 0;
+//			else if(sec.equals("(")||sec.equals("[")) return -1;
+//			else return 1;
+//		case "*":
+//			if(sec.equals("+")||sec.equals("?")) return 0;
+//			else if(sec.equals("(")||sec.equals("[")) return -1;
+//			else return 1;
 		default :
 			if(sec.equals("|")) return -3;
-			 return -1;//返回错误
+			else return -1;
 		}
-		
 	}
 	private boolean IsOptr(String ch)
 	{
@@ -83,63 +82,36 @@ public class RegularExpRecognize {
 					else ErrorRep();
 					
 				}
-				else if(ch.equals("]"))//如果为右中括号，弹出所又中间操作
+				else if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
 				{
-					String newExp;//生成新的入栈表达式
-					if(!Opnd.isEmpty()&&!Optr.isEmpty())
+					if(!Opnd.isEmpty())
 					{	
-						String optr=Optr.pop();
-						while(!optr.equals("["))
-							{
-									if(!Opnd.isEmpty())
-									{
-										newExp=optr+Opnd.pop();
-										if(!Opnd.isEmpty())
-										{
-											newExp=Opnd.pop()+newExp;
-											Opnd.push(newExp);
-											System.out.println(Opnd.peek());//test
-										}
-										else ErrorRep();
-									}
-									else ErrorRep();
-								optr=Optr.pop();//忘记再出栈了
-							}
+						String firCh=(String) Opnd.pop();
+						Opnd.push(firCh+ch);//将操作数和操作符一起入栈
+						System.out.println(Opnd.peek());//test
 					}
 					else ErrorRep();
-					
 				}
+				//留着switch方便以后改
 				else switch(IsFirst(Optr.peek(),ch))
 				{
 					case -1:
 						Optr.push(ch);//栈顶优先级低，或者栈顶为左括号,入栈
 						break;
-					case 1://加了个没必要的判断，方便以后添加新的正则规则
-						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
-						{	
-							if(!Opnd.isEmpty())
-							{	
-								String firCh=(String) Opnd.pop();
-								Opnd.push(firCh+ch);//将操作数和操作符一起入栈
-								System.out.println(Opnd.peek());//test
-							}
-							else ErrorRep();
-						}
-							break;
-					case 0://操作符优先级相同，左结合规则先计算入栈的
-						//加了个没必要的判断，方便以后添加新的正则规则
-						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
-						{
-							if(!Opnd.isEmpty())
-							{
-								String firCh=(String) Opnd.pop();
-								String normalOptr=(String) Optr.pop();//将栈顶元素取出
-								Opnd.push(firCh+normalOptr);//合成一个空间压入数值栈
-								System.out.println(Opnd.peek());//test
-							}
-							else ErrorRep();
-						}
-						break;
+//					case 0://操作符优先级相同，左结合规则先计算入栈的
+//						//加了个没必要的判断，方便以后添加新的正则规则
+//						if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
+//						{
+//							if(!Opnd.isEmpty())
+//							{
+//								String firCh=(String) Opnd.pop();
+//								String normalOptr=(String) Optr.pop();//将栈顶元素取出
+//								Opnd.push(firCh+normalOptr);//合成一个空间压入数值栈
+//								System.out.println(Opnd.peek());//test
+//							}
+//							else ErrorRep();
+//						}
+//						break;
 					default:ErrorRep();
 				}
 					
@@ -156,6 +128,33 @@ public class RegularExpRecognize {
 			  Define(subStr);
 			else break;
 		}
+		if(!Optr.isEmpty())//左右括号提取完了，就剩下双目符|
+		{
+			String tem=Optr.pop();
+			if(tem.equals("(")) ErrorRep();
+			else 
+			{
+				if(!Opnd.isEmpty())
+				{
+					String newExp;
+					String secOpnd=Opnd.pop();
+					if(!Opnd.isEmpty())
+					{
+						String firOpnd=Opnd.pop();
+						Opnd.push(firOpnd+tem+secOpnd);
+					}
+					else ErrorRep();
+				}
+				else ErrorRep();
+			}
+		}
 		//如果符号
+	}
+	public void testOut()//测试方法，把栈中的元素全部输出
+	{
+		while(!Opnd.isEmpty())
+		{
+			System.out.println(Opnd.pop());
+		}
 	}
 }
