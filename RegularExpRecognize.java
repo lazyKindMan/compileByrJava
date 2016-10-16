@@ -19,7 +19,9 @@ public class RegularExpRecognize {
 		//栈顶为左括号不管后面是什么符号直接入栈
 		case "(":return 1;	
 		case "|":if(sec.equals("|")) return 0;
+				 else if(sec.equals("&")) return 1; 
 				 else return -1; 
+		case "&": return 0;
 //		case "?":
 //			if(sec.equals("+")||sec.equals("*")) return 0;
 //			else if(sec.equals("(")||sec.equals("[")) return -1;
@@ -37,7 +39,7 @@ public class RegularExpRecognize {
 	}
 	private boolean IsOptr(String ch)
 	{
-		if(ch.equals("(")||ch.equals(")")||ch.equals("+")||ch.equals("*")||ch.equals("?")||ch.equals("|"))
+		if(ch.equals("(")||ch.equals(")")||ch.equals("+")||ch.equals("*")||ch.equals("?")||ch.equals("|")||ch.equals("&"))
 			return true;
 		else return false;
 	}
@@ -53,12 +55,12 @@ public class RegularExpRecognize {
 		{
 			if(ch.equals("("))
 				Optr.push(ch);
-			else if(ch.equals("|"))
+			else if(ch.equals("|")||ch.equals("&"))
 			{
 				if(Optr.isEmpty()) Optr.push(ch);//栈为空直接入栈
 				else switch(IsFirst(Optr.peek(),ch))
 				{
-					//1为直接入栈,0为直接双目运算
+					//1为直接入栈
 					case 1: Optr.push(ch);break;
 					case 0: 
 					{
@@ -97,7 +99,7 @@ public class RegularExpRecognize {
 	}
 	public void RegularExtract()//正则表达式提取,图的创建
 	{
-		String Opreation;//返回的字符串，
+		//String Opreation;//返回的字符串，
 		for(int i=0;i<regularExp.length();i++)
 		{
 			String ch=regularExp.substring(i, i+1);
@@ -120,7 +122,7 @@ public class RegularExpRecognize {
 			String tem=newRPN.substring(i, i+1);
 			if(IsOptr(tem)&&!tem.equals(")"))
 			{
-				if(tem.equals("|"))
+				if(tem.equals("|")||tem.equals("&"))
 				{
 					if(!Opnd.isEmpty())
 					{
