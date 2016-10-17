@@ -5,7 +5,7 @@ import java.util.*;
 public class RegularExpRecognize {
 	private Stack<String> Optr=new Stack<String>();//建立一个存放正则符的栈对象
 	private Stack<String> RPN=new Stack<String>();//存放逆波兰式
-	private Stack<String> Opnd=new Stack<String>();//存放识别的正则式栈
+	private Stack<Graph> GStack=new Stack<Graph>();//存放图的一个栈
 	private String regularExp;//正则表达式存储
 	
 	public RegularExpRecognize(String Exp)
@@ -22,18 +22,6 @@ public class RegularExpRecognize {
 				 else if(sec.equals("&")) return 1; 
 				 else return -1; 
 		case "&": return 0;
-//		case "?":
-//			if(sec.equals("+")||sec.equals("*")) return 0;
-//			else if(sec.equals("(")||sec.equals("[")) return -1;
-//			else return 1;
-//		case "+":
-//			if(sec.equals("?")||sec.equals("*")) return 0;
-//			else if(sec.equals("(")||sec.equals("[")) return -1;
-//			else return 1;
-//		case "*":
-//			if(sec.equals("+")||sec.equals("?")) return 0;
-//			else if(sec.equals("(")||sec.equals("[")) return -1;
-//			else return 1;
 		default:return -1;
 		}
 	}
@@ -97,6 +85,27 @@ public class RegularExpRecognize {
 		}
 		else RPN.push(ch);
 	}
+	private void GreateSingleMap(String sub)//创建单字符图
+	{
+		Node startNode=new Node(Node.getSum());
+		Node endNode=new Node(Node.getSum());
+		List<Edgle> eds=new ArrayList<Edgle>();
+		Edgle ed=new Edgle(sub,startNode,endNode);
+		Graph temGraph=new Graph(startNode,endNode);
+		eds.add(ed);//加入边集
+		temGraph.AddNode(startNode, eds);
+		GStack.push(temGraph);//将生成的图入栈
+	}
+	private void GreateAddMap()//创建一个加号性质的图
+	{
+		if(!GStack.isEmpty())
+		{
+			Graph preGraph=GStack.pop();//将前面的图栈取出
+			//增加一条回溯边
+			preGraph.AddEdgle(new Edgle("null",preGraph.GetEndnode(),preGraph.GetStartnode()));
+			GStack.push(preGraph);//入栈
+		}
+	}
 	public void RegularExtract()//正则表达式提取,图的创建
 	{
 		//String Opreation;//返回的字符串，
@@ -116,49 +125,34 @@ public class RegularExpRecognize {
 		{
 			newRPN=RPN.pop()+newRPN;
 		}
-		System.out.println(newRPN);
+		//System.out.println(newRPN);
 		for(int i=0;i<newRPN.length();i++)
 		{
-			String tem=newRPN.substring(i, i+1);
-			if(IsOptr(tem)&&!tem.equals(")"))
+			String sub=newRPN.substring(i, i+1);
+			if(IsOptr(sub))
 			{
-				if(tem.equals("|")||tem.equals("&"))
+				switch(sub)
 				{
-					if(!Opnd.isEmpty())
-					{
-						String temp1=Opnd.pop();
-						if(!Opnd.isEmpty())
-							{
-								String temp2=Opnd.pop();
-								Opnd.push(temp2+tem+temp1);
-//								System.out.println(temp2+tem+temp1);//test
-							}
-						else ErrorRep();
-					}
-					else ErrorRep();
+					case "+":GreateAddMap();break;
+					case "?":break;
+					case "*":break;
+					case "&":break;
+					case "|":break;
+					default:ErrorRep();
 				}
-				else if(tem.equals("+")||tem.equals("?")||tem.equals("*"))
-				{
-					if(!Opnd.isEmpty())
-					{
-						Opnd.push(Opnd.pop()+tem);
-//						System.out.println(Opnd.peek());//test
-					}
-					else ErrorRep();
-				}
-				else ErrorRep();
 			}
-			else if(!tem.equals(")"))//如果不是操作符且不是括号，直接存入栈
+			else
 			{
-				Opnd.push(tem);
-//				System.out.println(Opnd.peek());//test
+				GreateSingleMap(sub);
 			}
-			else ErrorRep();
 		}
 	}
 	public void TestOut()//test
 	{
-		while(!Opnd.isEmpty())
-		System.out.print(Opnd.pop());
+		if(!GStack.isEmpty())
+		{
+			Graph temGraph=GStack.pop();
+			temGraph.TraverseGraph();
+		}
 	}
 }
