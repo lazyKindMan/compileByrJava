@@ -13,8 +13,8 @@ public class Edgle {
 	public Edgle(String ma,Node st,Node end)
 	{
 		mark=ma;
-		startNode=(Node)st.Clone();
-		endNode=(Node)end.Clone();
+		startNode=st;
+		endNode=end;
 	}
 	public void SetMark(String ma)
 	{
@@ -26,8 +26,8 @@ public class Edgle {
 	}
 	public void setNode(Node st,Node end)//两个参数，getNodew为-1代表不对该参数进行设置
 	{
-		if(st.getNode()!=-1) startNode=(Node)st.Clone();
-		if(end.getNode()!=-1) endNode=(Node)end.Clone();
+		if(st.getNode()!=-1) startNode=st;
+		if(end.getNode()!=-1) endNode=end;
 	}
 	public Node GetStartnode()
 	{

@@ -15,8 +15,8 @@ public class Graph {
 	public Graph(Node st,Node ed)//注意使用克隆让数据封装
 	{
 		map=new HashMap<Node,List<Edgle>>();//初始化map
-		startNode=(Node)st.Clone();
-		endNode=(Node)ed.Clone();
+		startNode=st;
+		endNode=ed;
 	}
 	public Node GetStartnode()
 	{
@@ -52,10 +52,14 @@ public class Graph {
 			map.put(nd, newEds);
 		}
 	}
+	public Map<Node,List<Edgle>> getMap()
+	{
+		return map;
+	}
 	public void setNode(Node st,Node ed )//设置起始和结束节点
 	{
-		if(st.getNode()!=-1) startNode=(Node)st.Clone();
-		if(ed.getNode()!=-1) endNode=(Node)ed.Clone();
+		if(st.getNode()!=-1) startNode=st;
+		if(ed.getNode()!=-1) endNode=ed;
 	}
 	public void TraverseGraph()//遍历图操作 就输出，不做深搜广搜
 	{
@@ -69,5 +73,6 @@ public class Graph {
 			}
 			System.out.print("\n");
 		}
+		System.out.println(String.format("startNode:%d  endNode:%d",startNode.getNode(),endNode.getNode()));
 	}
 }

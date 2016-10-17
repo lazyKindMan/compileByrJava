@@ -25,17 +25,19 @@ public class Node implements Cloneable{
 		return sumNum-1;
 	}
 	//Node对象的复制
-	public Object Clone()
-	{
-		Object o=null;
-		try
-		{
-			o=(Node)super.clone();
-		}
-		catch(CloneNotSupportedException e)
-		{
-			System.out.println(e.toString());
-		}
-		return o;
-	}
+//	public Object Clone()
+//	{
+//		Object o=null;
+//		try
+//		{
+//			o=(Node)super.clone();
+//		}
+//		catch(CloneNotSupportedException e)
+//		{
+//			System.out.println(e.toString());
+//		}
+//		return o;
+//	}
+	//虽然不克隆会破坏封装性，但是鉴于一个点就是一个对象，克隆点虽然值是一样，但是所表示
+	//的应当还是另外个点，所以取消克隆对象方法
 }

@@ -105,6 +105,79 @@ public class RegularExpRecognize {
 			preGraph.AddEdgle(new Edgle("null",preGraph.GetEndnode(),preGraph.GetStartnode()));
 			GStack.push(preGraph);//入栈
 		}
+		else ErrorRep();
+	}
+	private void GreateQueMap()//创建一个问号性质的图
+	{
+		if(!GStack.isEmpty())
+		{
+			Graph preGraph=GStack.pop();
+			//增加一条直达边
+			preGraph.AddEdgle(new Edgle("null",preGraph.GetStartnode(),preGraph.GetEndnode()));
+			GStack.push(preGraph);//将新生成的栈入栈		
+		}
+	}
+	private void GreateAsteriskMap()//创建星号map 闭包增加两条边，起始到终点，终点到起始
+	{
+		if(!GStack.isEmpty())
+		{
+			Graph preGraph=GStack.pop();
+			//增加一条直达边
+			preGraph.AddEdgle(new Edgle("null",preGraph.GetStartnode(),preGraph.GetEndnode()));
+			preGraph.AddEdgle(new Edgle("null",preGraph.GetEndnode(),preGraph.GetStartnode()));
+			GStack.push(preGraph);//将新生成的栈入栈		
+		}
+		else ErrorRep();
+	}
+	private void GreateAndMap()
+	{
+		if(!GStack.isEmpty())
+		{
+			Graph frontGraph=GStack.pop();
+			if(!GStack.isEmpty())
+			{
+				Graph rearGraph=GStack.pop();
+				//将后取的图的end节点与先取图的开始节点连接
+				Graph newGraph=new Graph(rearGraph.GetStartnode(),frontGraph.GetEndnode());
+				for(Node nd : rearGraph.getMap().keySet())
+					for(int i=0;i<rearGraph.getMap().get(nd).size();i++)
+						newGraph.AddEdgle(rearGraph.getMap().get(nd).get(i));
+				for(Node nd : frontGraph.getMap().keySet())
+					for(int i=0;i<frontGraph.getMap().get(nd).size();i++)
+						newGraph.AddEdgle(frontGraph.getMap().get(nd).get(i));
+				newGraph.AddEdgle(new Edgle("null",rearGraph.GetEndnode(),frontGraph.GetStartnode()));
+				GStack.push(newGraph);
+			}
+			else ErrorRep();
+		}
+		else ErrorRep();
+	}
+	private void GreateOrMap()
+	{
+		if(!GStack.isEmpty())
+		{
+			Graph frontGraph=GStack.pop();
+			if(!GStack.isEmpty())
+			{
+				Graph rearGraph=GStack.pop();
+				//新建立一个起始点与一个结束点
+				Graph newGraph=new Graph(new Node(Node.getSum()),new Node(Node.getSum()));
+				//起始点将两个图的起始点连接
+				newGraph.AddEdgle(new Edgle("null",newGraph.GetStartnode(),rearGraph.GetStartnode()));
+				newGraph.AddEdgle(new Edgle("null",newGraph.GetStartnode(),frontGraph.GetStartnode()));
+				for(Node nd : rearGraph.getMap().keySet())
+					for(int i=0;i<rearGraph.getMap().get(nd).size();i++)
+						newGraph.AddEdgle(rearGraph.getMap().get(nd).get(i));
+				for(Node nd : frontGraph.getMap().keySet())
+					for(int i=0;i<frontGraph.getMap().get(nd).size();i++)
+						newGraph.AddEdgle(frontGraph.getMap().get(nd).get(i));
+				newGraph.AddEdgle(new Edgle("null",rearGraph.GetEndnode(),newGraph.GetEndnode()));
+				newGraph.AddEdgle(new Edgle("null",frontGraph.GetEndnode(),newGraph.GetEndnode()));
+				GStack.push(newGraph);
+			}
+			else ErrorRep();
+		}
+		else ErrorRep();
 	}
 	public void RegularExtract()//正则表达式提取,图的创建
 	{
@@ -134,10 +207,10 @@ public class RegularExpRecognize {
 				switch(sub)
 				{
 					case "+":GreateAddMap();break;
-					case "?":break;
-					case "*":break;
-					case "&":break;
-					case "|":break;
+					case "?":GreateQueMap();break;
+					case "*":GreateAsteriskMap();break;
+					case "&":GreateAndMap();break;
+					case "|":GreateOrMap();break;
 					default:ErrorRep();
 				}
 			}
