@@ -3,14 +3,12 @@ import java.util.*;
 
 //图类
 public class Graph {
-	protected Map<Node,List<Edgle>> map;
+	private Map<Node,List<Edgle>> map;
 	protected Node startNode;
 	protected Node endNode;
 	public Graph()
 	{
 		map=new HashMap<Node,List<Edgle>>();//初始化map
-		startNode.setNode(-1);
-		endNode.setNode(-1);
 	}
 	public Graph(Node st,Node ed)//注意使用克隆让数据封装
 	{
@@ -58,8 +56,8 @@ public class Graph {
 	}
 	public void setNode(Node st,Node ed )//设置起始和结束节点
 	{
-		if(st.getNode()!=-1) startNode=st;
-		if(ed.getNode()!=-1) endNode=ed;
+		if(st.getNode()!=-1||st.getDFANode()!=null) startNode=st;
+		if(ed.getNode()!=-1||ed.getDFANode()!=null) endNode=ed;
 	}
 	public void TraverseGraph()//遍历图操作 就输出，不做深搜广搜
 	{

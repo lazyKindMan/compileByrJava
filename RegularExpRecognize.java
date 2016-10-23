@@ -179,7 +179,7 @@ public class RegularExpRecognize {
 		}
 		else ErrorRep();
 	}
-	public void RegularExtract()//正则表达式提取,图的创建
+	private void RegularExtract()//正则表达式提取,图的创建
 	{
 		//String Opreation;//返回的字符串，
 		for(int i=0;i<regularExp.length();i++)
@@ -227,5 +227,10 @@ public class RegularExpRecognize {
 			Graph temGraph=GStack.pop();
 			temGraph.TraverseGraph();
 		}
+	}
+	public Graph getNFA()
+	{
+		RegularExtract();
+		return GStack.pop();
 	}
 }
