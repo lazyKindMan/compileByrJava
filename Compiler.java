@@ -19,8 +19,7 @@ public class Compiler {
 		Scanner in=new Scanner(System.in);
 		String exp=in.next();
 		RegularExpRecognize rec=new RegularExpRecognize(exp);
-		NFAToDFA toDfa=new NFAToDFA(rec.getNFA());
-		toDfa.CreateStateTable();
-		toDfa.showDFA();
+		NFAToDFA change=new NFAToDFA(rec.getNFA());
+		change.showDFA();
 	}
 }

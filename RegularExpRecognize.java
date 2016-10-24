@@ -77,7 +77,7 @@ public class RegularExpRecognize {
 			}
 			else if(ch.equals("+")||ch.equals("?")||ch.equals("*"))
 			{//如果是单目操作符
-				if(RPN.isEmpty()||RPN.peek().equals("(")||RPN.peek().equals("|"))
+				if(RPN.isEmpty()||RPN.peek().equals("("))
 					ErrorRep();
 				else RPN.push(ch);//单操作符直接入栈
 			}
@@ -122,10 +122,17 @@ public class RegularExpRecognize {
 		if(!GStack.isEmpty())
 		{
 			Graph preGraph=GStack.pop();
-			//增加一条直达边
-			preGraph.AddEdgle(new Edgle("null",preGraph.GetStartnode(),preGraph.GetEndnode()));
-			preGraph.AddEdgle(new Edgle("null",preGraph.GetEndnode(),preGraph.GetStartnode()));
-			GStack.push(preGraph);//将新生成的栈入栈		
+//			增加一条直达边
+			Node startNode=preGraph.GetStartnode();
+			Node endNode=preGraph.GetEndnode();
+			preGraph.AddEdgle(new Edgle("null",startNode,endNode));
+			Node newStart=new Node(Node.getSum());
+			Node newEnd=new Node(Node.getSum());//创建两个新的起始结束节点
+			preGraph.AddEdgle(new Edgle("null",newStart,startNode));
+			preGraph.AddEdgle(new Edgle("null",endNode,newEnd));
+			preGraph.AddEdgle(new Edgle("null",newEnd,newStart));
+			preGraph.setNode(newStart, newEnd);//重新设置开始结束节点
+			GStack.push(preGraph);//将新生成的栈入栈		 
 		}
 		else ErrorRep();
 	}
